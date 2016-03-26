@@ -42,8 +42,7 @@ return function ConfigRunner(){
             actions.forEach(function(obj){
                 switch(obj.action){
                     case 'delete':
-
-                        deletes.push(obj.path);
+                        deletes.push(obj);
                         break;
                     case 'upload':
                         fileUtils.getContents(obj.path).then(function(contents){
@@ -60,6 +59,50 @@ return function ConfigRunner(){
                 }
             });
             if(deletes.length !== 0) {
+
+                var dates = [1558941400000];
+                deletes.forEach(function (toDel) {
+                  if ((/\.(js|css|png)$/i).test(toDel.path)) {
+                    var millis = toDel.lastModified.setSeconds(0);
+                    if (dates.indexOf(millis) < 0) {
+                      dates.push(millis);
+                    }
+                  }
+                });
+
+                if (dates.length === 1) {
+                  console.log('SKIP deleteing the following: ');
+                  deletes.forEach(function(d){console.log('\t' + d.path)});
+                  return;
+                }
+
+                dates.sort(function(a, b) {
+                  return a - b;
+                });
+
+                var justRemove = dates.shift();
+                var skip = [];
+
+                var reallyDelete = [];
+                deletes.forEach(function (toDel) {
+                  var millis = toDel.lastModified.setSeconds(0);
+                  if (dates.indexOf(millis) >= 0 && (millis + (12 * 60 * 60 * 1000) < Date.now())) {
+                    reallyDelete.push(toDel);
+                  } else {
+                    skip.push(toDel);
+                  }
+                });
+
+                if (skip.length > 0) {
+                  console.log('SKIP deleteing the following: ');
+                  skip.forEach(function(d){console.log('\t' + d.path)});
+                  return;
+                }
+
+                deletes = reallyDelete.map(function (d) {
+                  return d.path;
+                });
+
                 console.log('deleting the following: ');
                 deletes.forEach(function(path){console.log('\t' + path)});
                 s3Wrapper.deleteObjects(config.bucketName,deletes).then(

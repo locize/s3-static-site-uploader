@@ -10,7 +10,7 @@ function RemoteRunner(bucketName,collection,s3){
                 var key = content.Key;
                 var tag = content.ETag;
                 tag = tag.replace(strip,'');
-                collection.foundRemote(key,tag);
+                collection.foundRemote(key,tag,content.LastModified);
             });
             collection.remoteDone();
         },console.log);

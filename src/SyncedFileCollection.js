@@ -27,9 +27,9 @@ return function SyncedFileCollection(){
         get(path).foundFile();
     }
 
-    function foundRemote(path,hash){
+    function foundRemote(path,hash,lastModified){
         if(isRemoteDone) throw new Error('Remote is supposed to be done');
-        get(path).foundRemote(hash);
+        get(path).foundRemote(hash,lastModified);
     }
 
     var isGlobDone = false;

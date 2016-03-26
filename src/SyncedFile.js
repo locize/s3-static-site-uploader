@@ -9,6 +9,8 @@ return function SyncedFile (path){
     var remoteHash = Q.defer();
     var action = Q.defer();
 
+    var lastModified;
+
     function foundFile(){
         resolveDelete(false);
     }
@@ -17,7 +19,8 @@ return function SyncedFile (path){
         resolveDelete(true);
     }
 
-    function foundRemote(hash){
+    function foundRemote(hash,lModified){
+        lastModified = lModified;
         remoteHash.resolve(hash);
     }
 
@@ -26,15 +29,15 @@ return function SyncedFile (path){
     }
 
     function resolveDelete(_del){
-        del.resolve({'delete':_del,path:path});
+        del.resolve({'delete':_del,path:path,lastModified:lastModified});
     }
 
     function resolveUpload(_upload) {
-        upload.resolve({'upload':_upload,path:path});
+        upload.resolve({'upload':_upload,path:path,lastModified:lastModified});
     }
 
     function resolveAction(_action){
-        action.resolve({'action':_action,path:path});
+        action.resolve({'action':_action,path:path,lastModified:lastModified});
     }
 
     Q.spread([del.promise,remoteHash.promise],function(del,remoteHash){
