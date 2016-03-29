@@ -94,9 +94,8 @@ return function ConfigRunner(){
                 });
 
                 if (skip.length > 0) {
-                  console.log('SKIP deleteing the following: ');
+                  console.log('SKIP deleteing the following (because of age): ');
                   skip.forEach(function(d){console.log('\t' + d.path)});
-                  return;
                 }
 
                 deletes = reallyDelete.map(function (d) {
