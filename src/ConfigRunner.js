@@ -54,8 +54,6 @@ return function ConfigRunner(){
                                 console.log(reason);
                             });
                         });
-
-
                 }
             });
             if(deletes.length !== 0) {
@@ -101,6 +99,11 @@ return function ConfigRunner(){
                 deletes = reallyDelete.map(function (d) {
                   return d.path;
                 });
+
+                if (deletes.length === 0) {
+                  console.log('nothing to delete!');
+                  return;
+                }
 
                 console.log('deleting the following: ');
                 deletes.forEach(function(path){console.log('\t' + path)});
