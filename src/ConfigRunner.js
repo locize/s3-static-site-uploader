@@ -7,6 +7,14 @@ fileUtils = fileUtils || require('./file-utils.js');
 AWS = AWS || require('aws-sdk');
 var S3 = AWS.S3;
 
+if (process.env.DELETE_EXPIRATION) {
+    try {
+        process.env.DELETE_EXPIRATION = parseInt(process.env.DELETE_EXPIRATION, 10);
+    } catch (e) {}
+}
+
+var reallyDeleteExpiration = process.env.DELETE_EXPIRATION || 7 * 24 * 60 * 60 * 1000;
+
 return function ConfigRunner(){
     var config;
 
@@ -86,7 +94,7 @@ return function ConfigRunner(){
                 var reallyDelete = [];
                 deletes.forEach(function (toDel) {
                   var millis = toDel.lastModified.setSeconds(0);
-                  if (dates.indexOf(millis) >= 0 && (millis + (12 * 60 * 60 * 1000) < Date.now())) {
+                  if (dates.indexOf(millis) >= 0 && (millis + (reallyDeleteExpiration) < Date.now())) {
                     reallyDelete.push(toDel);
                   } else {
                     skip.push(toDel);
